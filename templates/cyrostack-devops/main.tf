@@ -117,13 +117,13 @@ data "coder_parameter" "home_disk_size" {
 
 locals {
   workspace_labels = {
-    "app.kubernetes.io/name"     = "coder-workspace"
-    "app.kubernetes.io/part-of"  = "cyrostack-coder"
-    "com.coder.resource"         = "true"
-    "com.coder.workspace.id"     = data.coder_workspace.me.id
-    "com.coder.workspace.name"   = data.coder_workspace.me.name
-    "com.coder.user.id"          = data.coder_workspace_owner.me.id
-    "com.coder.user.username"    = data.coder_workspace_owner.me.name
+    "app.kubernetes.io/name"    = "coder-workspace"
+    "app.kubernetes.io/part-of" = "cyrostack-coder"
+    "com.coder.resource"        = "true"
+    "com.coder.workspace.id"    = data.coder_workspace.me.id
+    "com.coder.workspace.name"  = data.coder_workspace.me.name
+    "com.coder.user.id"         = data.coder_workspace_owner.me.id
+    "com.coder.user.username"   = data.coder_workspace_owner.me.name
   }
 
   workspace_annotations = {
@@ -275,8 +275,8 @@ resource "kubernetes_deployment_v1" "workspace" {
 
     selector {
       match_labels = {
-        "app.kubernetes.io/name"  = "coder-workspace"
-        "com.coder.workspace.id"  = data.coder_workspace.me.id
+        "app.kubernetes.io/name" = "coder-workspace"
+        "com.coder.workspace.id" = data.coder_workspace.me.id
       }
     }
 
