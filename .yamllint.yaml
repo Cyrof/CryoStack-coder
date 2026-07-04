@@ -24,3 +24,4 @@ ignore: |
   .git/
   chart/charts/
   chart/Chart.lock
+  chart/templates/

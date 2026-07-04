@@ -1,0 +1,28 @@
+{{- if .Values.workspace.rbac.enabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.workspace.rbac.serviceAccountName | quote }}
+  namespace: {{ .Values.workspace.namespace | quote }}
+  labels:
+    app.kubernetes.io/name: cyrostack-coder
+    app.kubernetes.io/component: workspace-rbac
+    app.kubernetes.io/managed-by: Helm
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Values.workspace.rbac.serviceAccountName | quote }}
+  labels:
+    app.kubernetes.io/name: cyrostack-coder
+    app.kubernetes.io/component: workspace-rbac
+    app.kubernetes.io/managed-by: Helm
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.workspace.rbac.serviceAccountName | quote }}
+    namespace: {{ .Values.workspace.namespace | quote }}
+roleRef:
+  kind: ClusterRole
+  name: {{ .Values.workspace.rbac.clusterRoleName | quote }}
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

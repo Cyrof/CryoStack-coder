@@ -4,3 +4,14 @@ description: CyroStack Coder platform Helm chart
 type: application
 version: 0.1.0
 appVersion: "0.1.0"
+
+dependencies:
+  - name: coder
+    version: "2.34.3"
+    repository: https://helm.coder.com/v2
+    condition: coder.enabled
+
+  - name: postgresql
+    version: ">=16.0.0 <17.0.0"
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
