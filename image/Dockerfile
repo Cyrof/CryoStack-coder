@@ -123,7 +123,8 @@ RUN case "${TARGETARCH}" in \
     && rm -f /tmp/k9s.tar.gz
 
 # GitHub CLI
-RUN mkdir -p -m 755 /etc/apt/keyrings \
+RUN mkdir -p /etc/apt/keyrings \
+    && chmod 755 /etc/apt/keyrings \
     && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
       -o /etc/apt/keyrings/githubcli-archive-keyring.gpg \
     && chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
