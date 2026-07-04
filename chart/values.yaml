@@ -1,0 +1,17 @@
+placeholder:
+  enabled: true
+
+domain:
+  host: coder.cyrostack.arpa
+  wildcardHost: "*.coder.cyrostack.arpa"
+
+workspaceImage:
+  repository: ghcr.io/cyrof/cyrostack-coder
+  tag: v0.1.0
+
+workspace:
+  namespace: coder-workspace
+
+storage:
+  className: nfs-csi
+  size: 20Gi

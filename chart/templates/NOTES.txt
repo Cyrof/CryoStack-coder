@@ -1,0 +1,10 @@
+cyrostack-coder placeholder chart installed.
+
+This chart is currently a placeholder so CI can run Helm lint and template checks.
+
+Next steps:
+- Add Coder Helm chart dependency
+- Add PostgreSQL dependency or external database configuration
+- Add workspace namespace
+- Add workspace RBAC
+- Add ingress values for coder.cyrostack.arpa
