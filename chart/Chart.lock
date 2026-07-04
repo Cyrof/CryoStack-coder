@@ -1,0 +1,9 @@
+dependencies:
+- name: coder
+  repository: https://helm.coder.com/v2
+  version: 2.34.3
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 16.7.27
+digest: sha256:1ed0062240699b3cae438f16e6907031861bb7a9632213949838f40c52b9c996
+generated: "2026-07-04T22:08:02.033334334+08:00"
