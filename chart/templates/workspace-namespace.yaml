@@ -1,0 +1,10 @@
+{{- if .Values.workspace.createNamespace }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.workspace.namespace | quote }}
+  labels:
+    app.kubernetes.io/name: cyrostack-coder
+    app.kubernetes.io/component: workspaces
+    app.kubernetes.io/managed-by: Helm
+{{- end }}

@@ -1,10 +1,26 @@
-cyrostack-coder placeholder chart installed.
+cyrostack-coder has been installed.
 
-This chart is currently a placeholder so CI can run Helm lint and template checks.
+Coder URL:
+  {{ .Values.domain.scheme }}://{{ .Values.domain.host }}
 
-Next steps:
-- Add Coder Helm chart dependency
-- Add PostgreSQL dependency or external database configuration
-- Add workspace namespace
-- Add workspace RBAC
-- Add ingress values for coder.cyrostack.arpa
+Wildcard workspace URL:
+  {{ .Values.domain.wildcardHost }}
+
+Workspace namespace:
+  {{ .Values.workspace.namespace }}
+
+Workspace ServiceAccount:
+  {{ .Values.workspace.rbac.serviceAccountName }}
+
+Expected external secrets:
+  - coder-postgresql-secret
+  - coder-db-url
+
+Example database URL:
+  postgres://coder:<password>@coder-postgresql.coder.svc.cluster.local:5432/coder?sslmode=disable
+
+After Coder is running, push the workspace template:
+
+  coder login {{ .Values.domain.scheme }}://{{ .Values.domain.host }}
+  cd templates/cyrostack-devops
+  coder templates push cyrostack-devops
