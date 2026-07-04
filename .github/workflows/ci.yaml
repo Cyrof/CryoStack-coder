@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - dev
+
+  pull_request:
+    branches:
+      - dev
+      - stable
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  helm-template:
+    name: Helm template check
+    runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.head_ref || github.ref_name, 'release/') }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Build chart dependencies
+        run: helm dependency build chart
+
+      - name: Lint Helm chart
+        run: helm lint chart
+
+      - name: Render Helm chart
+        run: |
+          helm template cyrostack-coder chart \
+            --namespace coder \
+            --values chart/values.yaml
+
+  terraform-template:
+    name: Coder template check
+    runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.head_ref || github.ref_name, 'release/') }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Check Terraform formatting
+        run: terraform fmt -check -recursive templates
+
+      - name: Validate Terraform templates
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ ! -d templates ]; then
+            echo "No templates directory found, skipping."
+            exit 0
+          fi
+
+          for dir in templates/*; do
+            if [ -d "$dir" ] && [ -f "$dir/main.tf" ]; then
+              echo "Validating $dir"
+              terraform -chdir="$dir" init -backend=false
+              terraform -chdir="$dir" validate
+            fi
+          done
+
+  docker-build:
+    name: Docker build check
+    runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.head_ref || github.ref_name, 'release/') }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build workspace image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./image
+          file: ./image/Dockerfile
+          platforms: linux/amd64
+          push: false
+          tags: cyrostack-coder:test
