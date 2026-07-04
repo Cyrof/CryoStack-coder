@@ -1,0 +1,26 @@
+---
+extends: default
+
+rules:
+  line-length:
+    max: 120
+    level: warning
+
+  truthy:
+    allowed-values:
+      - "true"
+      - "false"
+      - "on"
+      - "off"
+
+  comments:
+    min-spaces-from-content: 1
+
+  indentation:
+    spaces: 2
+    indent-sequences: true
+
+ignore: |
+  .git/
+  chart/charts/
+  chart/Chart.lock
