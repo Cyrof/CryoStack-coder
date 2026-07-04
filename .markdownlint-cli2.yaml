@@ -3,8 +3,11 @@ config:
     line_length: 120
     code_blocks: false
     tables: false
+    headings: false
+    html_blocks: false
 
   MD033: false
+  MD034: false
   MD041: false
 
 globs:
