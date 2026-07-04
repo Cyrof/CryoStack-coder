@@ -4,7 +4,10 @@
 
 <p align="center">
   <a href="https://github.com/cyrof/cyrostack-coder/actions/workflows/ci.yaml">
-    <img src="https://img.shields.io/github/actions/workflow/status/cyrof/cyrostack-coder/ci.yaml?branch=dev&style=for-the-badge&label=CI" alt="CI Status">
+    <img
+      src="https://img.shields.io/github/actions/workflow/status/cyrof/cyrostack-coder/ci.yaml?branch=dev&style=for-the-badge&label=CI"
+      alt="CI Status"
+    >
   </a>
   <a href="https://github.com/cyrof/cyrostack-coder/actions/workflows/lint.yaml">
     <img src="https://img.shields.io/github/actions/workflow/status/cyrof/cyrostack-coder/lint.yaml?branch=dev&style=for-the-badge&label=Lint" alt="Lint Status">
@@ -29,7 +32,11 @@
     Coder platform, workspace image, and DevOps workspace templates for CyroStack.
     <br />
     <br />
-    <a href="https://github.com/cyrof/cyrostack-coder/issues/new?labels=bug&template=bug_report.md">Report Bug</a>
+    <a
+      href="https://github.com/cyrof/cyrostack-coder/issues/new?labels=bug&template=bug_report.md"
+    >
+  Report Bug
+</a>
     &middot;
     <a href="https://github.com/cyrof/cyrostack-coder/issues/new?labels=enhancement&template=feature_request.md">Request Feature</a>
     &middot;
@@ -519,6 +526,6 @@ Distributed under the Apache License 2.0. See `LICENSE` for more information.
 
 Project Owner: [cyrof](https://github.com/cyrof)
 
-Repository: https://github.com/cyrof/cyrostack-coder
+Repository: [cyrof/cyrostack-coder](https://github.com/cyrof/cyrostack-coder)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
