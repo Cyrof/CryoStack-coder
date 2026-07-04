@@ -161,7 +161,8 @@ terraform validate
 
 ## Notes
 
-This template assumes the Coder platform, workspace namespace, and workspace RBAC have already been deployed by the Helm chart.
+This template assumes the Coder platform, workspace namespace, and workspace RBAC have already been
+deployed by the Helm chart.
 
 This template only creates per-workspace resources such as:
 
