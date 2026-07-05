@@ -10,16 +10,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [v1.0.1] - 2026-07-05
 
 ### Added
-- (fill)
+
+- No addition in this release.
 
 ### Changed
-- (fill)
+
+- No changes in this release.
 
 ### Fixed
-- (fill)
+
+- Fixed name typo.
 
 ### Removed
-- (fill)
+
+- No removals in this release.
 
 ## [v1.0.0] - 2026-07-04
 
@@ -33,22 +37,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `coder-workspace-admin` ServiceAccount with `cluster-admin` access for DevOps workspaces.
 - Added the custom Coder workspace image under `image/`.
 - Added preinstalled DevOps and development tooling to the workspace image, including:
-  - code-server
-  - kubectl
-  - flux
-  - helm
-  - kustomize
-  - sops
-  - age
-  - gh
-  - k9s
-  - jq
-  - yq
-  - Go
-  - Python
-  - uv
-  - Node.js and npm
-  - Ansible
+    - code-server
+    - kubectl
+    - flux
+    - helm
+    - kustomize
+    - sops
+    - age
+    - gh
+    - k9s
+    - jq
+    - yq
+    - Go
+    - Python
+    - uv
+    - Node.js and npm
+    - Ansible
 - Added `verify-tools.sh` to validate required tools inside the workspace image.
 - Added the initial Coder Terraform workspace template under `templates/cyrostack-devops/`.
 - Added per-workspace Kubernetes Deployment and PVC provisioning through the Coder template.
