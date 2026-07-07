@@ -35,6 +35,7 @@ check_tool npm
 check_tool ansible
 check_tool go
 check_tool uv
+check_tool terraform
 
 echo
 echo "Versions:"
@@ -56,6 +57,7 @@ npm --version
 ansible --version | head -n 1
 go version
 uv --version
+terraform version || true
 
 echo
 echo "All required tools are available."

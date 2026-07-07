@@ -3,6 +3,7 @@ FROM ubuntu:24.04
 
 ARG TARGETARCH
 ARG GO_VERSION=1.25.0
+ARG TERRAFORM_VERSION=1.15.7
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=C.UTF-8
@@ -40,6 +41,10 @@ RUN apt-get update \
       vim \
       wget \
       zsh \
+      iproute2 \
+      iptables \
+      libcap2-bin \
+      wireguard-tools \
     && rm -rf /var/lib/apt/lists/*
 
 # uv
@@ -60,6 +65,19 @@ RUN case "${TARGETARCH}" in \
 ENV PATH="/usr/local/go/bin:${PATH}"
 ENV GOPATH="/home/coder/go"
 
+# Terraform
+RUN case "${TARGETARCH}" in \
+      amd64) TERRAFORM_ARCH="amd64" ;; \
+      arm64) TERRAFORM_ARCH="arm64" ;; \
+      *) echo "Unsupported architecture for Terraform: ${TARGETARCH}" && exit 1 ;; \
+    esac \
+    && curl -fsSL -o /tmp/terraform.zip \
+      "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${TERRAFORM_ARCH}.zip" \
+    && unzip -q /tmp/terraform.zip -d /usr/local/bin \
+    && chmod +x /usr/local/bin/terraform \
+    && rm -f /tmp/terraform.zip \
+    && terraform version
+
 # kubectl
 RUN curl -fsSL -o /usr/local/bin/kubectl \
       "https://dl.k8s.io/release/$(curl -fsSL https://dl.k8s.io/release/stable.txt)/bin/linux/${TARGETARCH}/kubectl" \
@@ -72,8 +90,19 @@ RUN curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm
 RUN curl -fsSL https://fluxcd.io/install.sh | bash
 
 # kustomize
-RUN curl -fsSL https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh \
-    | bash -s -- /usr/local/bin
+ARG KUSTOMIZE_VERSION=5.8.1
+RUN set -eux; \
+    case "${TARGETARCH}" in \
+      amd64) KUSTOMIZE_ARCH="amd64" ;; \
+      arm64) KUSTOMIZE_ARCH="arm64" ;; \
+      *) echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
+    esac; \
+    curl -fsSL -o /tmp/kustomize.tar.gz \
+      "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_${KUSTOMIZE_ARCH}.tar.gz"; \
+    tar -xzf /tmp/kustomize.tar.gz -C /usr/local/bin kustomize; \
+    chmod +x /usr/local/bin/kustomize; \
+    rm /tmp/kustomize.tar.gz; \
+    kustomize version
 
 # sops
 RUN case "${TARGETARCH}" in \
@@ -138,9 +167,15 @@ RUN mkdir -p /etc/apt/keyrings \
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
 # Coder workspace user
-RUN useradd -m -s /bin/bash coder \
-    && echo "coder ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/coder \
-    && chmod 0440 /etc/sudoers.d/coder \
+# Ubuntu 24.04 images may already include an ubuntu user at UID 1000.
+# Our Terraform runs the workspace as UID/GID 1000 and expects /home/coder,
+# so make UID/GID 1000 belong to coder.
+RUN if id ubuntu >/dev/null 2>&1; then userdel -r ubuntu || true; fi \
+    && if getent group ubuntu >/dev/null 2>&1; then groupdel ubuntu || true; fi \
+    && groupadd --gid 1000 coder \
+    && useradd --uid 1000 --gid 1000 -m -s /bin/bash coder \
+    && echo "coder ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-coder \
+    && chmod 0440 /etc/sudoers.d/90-coder \
     && mkdir -p /home/coder/.local/bin /home/coder/workspace /home/coder/go \
     && chown -R coder:coder /home/coder
 
