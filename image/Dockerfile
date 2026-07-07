@@ -40,6 +40,10 @@ RUN apt-get update \
       vim \
       wget \
       zsh \
+      iproute2 \
+      iptables \
+      libcap2-bin \
+      wireguard-tools \
     && rm -rf /var/lib/apt/lists/*
 
 # uv
@@ -138,9 +142,15 @@ RUN mkdir -p /etc/apt/keyrings \
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
 # Coder workspace user
-RUN useradd -m -s /bin/bash coder \
-    && echo "coder ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/coder \
-    && chmod 0440 /etc/sudoers.d/coder \
+# Ubuntu 24.04 images may already include an ubuntu user at UID 1000.
+# Our Terraform runs the workspace as UID/GID 1000 and expects /home/coder,
+# so make UID/GID 1000 belong to coder.
+RUN if id ubuntu >/dev/null 2>&1; then userdel -r ubuntu || true; fi \
+    && if getent group ubuntu >/dev/null 2>&1; then groupdel ubuntu || true; fi \
+    && groupadd --gid 1000 coder \
+    && useradd --uid 1000 --gid 1000 -m -s /bin/bash coder \
+    && echo "coder ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-coder \
+    && chmod 0440 /etc/sudoers.d/90-coder \
     && mkdir -p /home/coder/.local/bin /home/coder/workspace /home/coder/go \
     && chown -R coder:coder /home/coder
 
