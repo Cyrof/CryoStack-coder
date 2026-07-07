@@ -293,12 +293,12 @@ resource "kubernetes_deployment_v1" "workspace" {
       spec {
         service_account_name = var.service_account_name
 
-      security_context {
-        run_as_user                = 1000
-        run_as_group               = 1000
-        fs_group                   = 1000
-        run_as_non_root            = true
-      }
+        security_context {
+          run_as_user     = 1000
+          run_as_group    = 1000
+          fs_group        = 1000
+          run_as_non_root = true
+        }
 
         container {
           name              = "dev"
@@ -311,7 +311,7 @@ resource "kubernetes_deployment_v1" "workspace" {
             run_as_group               = 1000
             allow_privilege_escalation = true
             read_only_root_filesystem  = false
-            privileged = true
+            privileged                 = true
 
             capabilities {
               add = [
