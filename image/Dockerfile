@@ -3,6 +3,7 @@ FROM ubuntu:24.04
 
 ARG TARGETARCH
 ARG GO_VERSION=1.25.0
+ARG TERRAFORM_VERSION=1.15.7
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=C.UTF-8
@@ -40,6 +41,10 @@ RUN apt-get update \
       vim \
       wget \
       zsh \
+      iproute2 \
+      iptables \
+      libcap2-bin \
+      wireguard-tools \
     && rm -rf /var/lib/apt/lists/*
 
 # uv
@@ -59,6 +64,19 @@ RUN case "${TARGETARCH}" in \
 
 ENV PATH="/usr/local/go/bin:${PATH}"
 ENV GOPATH="/home/coder/go"
+
+# Terraform
+RUN case "${TARGETARCH}" in \
+      amd64) TERRAFORM_ARCH="amd64" ;; \
+      arm64) TERRAFORM_ARCH="arm64" ;; \
+      *) echo "Unsupported architecture for Terraform: ${TARGETARCH}" && exit 1 ;; \
+    esac \
+    && curl -fsSL -o /tmp/terraform.zip \
+      "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${TERRAFORM_ARCH}.zip" \
+    && unzip -q /tmp/terraform.zip -d /usr/local/bin \
+    && chmod +x /usr/local/bin/terraform \
+    && rm -f /tmp/terraform.zip \
+    && terraform version
 
 # kubectl
 RUN curl -fsSL -o /usr/local/bin/kubectl \
@@ -138,9 +156,15 @@ RUN mkdir -p /etc/apt/keyrings \
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
 # Coder workspace user
-RUN useradd -m -s /bin/bash coder \
-    && echo "coder ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/coder \
-    && chmod 0440 /etc/sudoers.d/coder \
+# Ubuntu 24.04 images may already include an ubuntu user at UID 1000.
+# Our Terraform runs the workspace as UID/GID 1000 and expects /home/coder,
+# so make UID/GID 1000 belong to coder.
+RUN if id ubuntu >/dev/null 2>&1; then userdel -r ubuntu || true; fi \
+    && if getent group ubuntu >/dev/null 2>&1; then groupdel ubuntu || true; fi \
+    && groupadd --gid 1000 coder \
+    && useradd --uid 1000 --gid 1000 -m -s /bin/bash coder \
+    && echo "coder ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-coder \
+    && chmod 0440 /etc/sudoers.d/90-coder \
     && mkdir -p /home/coder/.local/bin /home/coder/workspace /home/coder/go \
     && chown -R coder:coder /home/coder
 
