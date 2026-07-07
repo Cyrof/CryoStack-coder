@@ -242,11 +242,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Normalize image name
+        id: image
+        shell: bash
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY}"
+          IMAGE="${IMAGE,,}"
+          echo "name=${IMAGE}" >> "$GITHUB_OUTPUT"
+
       - name: Docker metadata
         id: meta
         uses: docker/metadata-action@v6
         with:
-          images: ${{ steps.version.outputs.image }}
+          images: ${{ steps.image.outputs.name }}
           tags: |
             type=raw,value=${{ steps.version.outputs.tag }}
             type=raw,value=latest
@@ -261,10 +269,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-          # Use registry cache instead of GitHub Actions cache.
-          # This avoids "failed to reserve cache" from type=gha.
-          cache-from: type=registry,ref=${{ steps.version.outputs.image }}:buildcache
-          cache-to: type=registry,ref=${{ steps.version.outputs.image }}:buildcache,mode=max
+          cache-from: type=registry,ref=${{ steps.image.outputs.name }}:buildcache
+          cache-to: type=registry,ref=${{ steps.image.outputs.name }}:buildcache,mode=max
 
       - name: Check if GitHub Release exists
         id: releasecheck
