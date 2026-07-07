@@ -10,16 +10,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [v1.0.2] - 2026-07-07
 
 ### Added
-- (fill)
+
+- No addition in this release.
 
 ### Changed
-- (fill)
+
+- Added terraform tools to custom coder image.
+- Added WireGuard tools to custom coder image.
+- Added `coder` super user instead of the default `ubuntu` user.
+- Enabled sudo in terraform template for WireGuard
 
 ### Fixed
-- (fill)
+
+- Fixed markdown linting to use 4 tabwidth instead of 2 tabwidth.
+- Fixed kustomize install using wrong architecture.
 
 ### Removed
-- (fill)
+
+- No removal in this release.
 
 ## [v1.0.1] - 2026-07-05
 
