@@ -136,7 +136,7 @@ locals {
 
 resource "coder_agent" "main" {
   os   = "linux"
-  arch = "amd64"
+  arch = "arm64"
 
   startup_script = <<-EOT
     set -e
@@ -293,12 +293,12 @@ resource "kubernetes_deployment_v1" "workspace" {
       spec {
         service_account_name = var.service_account_name
 
-        security_context {
-          run_as_user     = 1000
-          run_as_group    = 1000
-          fs_group        = 1000
-          run_as_non_root = true
-        }
+      security_context {
+        run_as_user                = 1000
+        run_as_group               = 1000
+        fs_group                   = 1000
+        run_as_non_root            = true
+      }
 
         container {
           name              = "dev"
@@ -309,8 +309,16 @@ resource "kubernetes_deployment_v1" "workspace" {
           security_context {
             run_as_user                = 1000
             run_as_group               = 1000
-            allow_privilege_escalation = false
+            allow_privilege_escalation = true
             read_only_root_filesystem  = false
+            privileged = true
+
+            capabilities {
+              add = [
+                "NET_ADMIN",
+                "NET_RAW",
+              ]
+            }
           }
 
           env {
@@ -350,6 +358,12 @@ resource "kubernetes_deployment_v1" "workspace" {
             mount_path = "/home/coder"
             read_only  = false
           }
+
+          volume_mount {
+            name       = "dev-net-tun"
+            mount_path = "/dev/net/tun"
+            read_only  = false
+          }
         }
 
         volume {
@@ -358,6 +372,15 @@ resource "kubernetes_deployment_v1" "workspace" {
           persistent_volume_claim {
             claim_name = kubernetes_persistent_volume_claim_v1.home.metadata[0].name
             read_only  = false
+          }
+        }
+
+        volume {
+          name = "dev-net-tun"
+
+          host_path {
+            path = "/dev/net/tun"
+            type = "CharDevice"
           }
         }
       }
