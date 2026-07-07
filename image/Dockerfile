@@ -90,8 +90,19 @@ RUN curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm
 RUN curl -fsSL https://fluxcd.io/install.sh | bash
 
 # kustomize
-RUN curl -fsSL https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh \
-    | bash -s -- /usr/local/bin
+ARG KUSTOMIZE_VERSION=5.8.1
+RUN set -eux; \
+    case "${TARGETARCH}" in \
+      amd64) KUSTOMIZE_ARCH="amd64" ;; \
+      arm64) KUSTOMIZE_ARCH="arm64" ;; \
+      *) echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
+    esac; \
+    curl -fsSL -o /tmp/kustomize.tar.gz \
+      "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_${KUSTOMIZE_ARCH}.tar.gz"; \
+    tar -xzf /tmp/kustomize.tar.gz -C /usr/local/bin kustomize; \
+    chmod +x /usr/local/bin/kustomize; \
+    rm /tmp/kustomize.tar.gz; \
+    kustomize version
 
 # sops
 RUN case "${TARGETARCH}" in \
