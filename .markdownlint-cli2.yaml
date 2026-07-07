@@ -3,8 +3,19 @@ config:
   MD033: false
   MD034: false
   MD041: false
+
+  # Use 4-space indentation for nested unordered lists
   MD007:
     indent: 4
+
+  # Treat tabs as 4 spaces
+  MD010:
+    spaces_per_tab: 4
+
+  # Allow repeated headings like "Added", "Changed", "Fixed"
+  # under different changelog release sections
+  MD024:
+    siblings_only: true
 
 globs:
   - "**/*.md"
