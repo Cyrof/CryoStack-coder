@@ -3,6 +3,7 @@ FROM ubuntu:24.04
 
 ARG TARGETARCH
 ARG GO_VERSION=1.25.0
+ARG TERRAFORM_VERSION=1.15.7
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=C.UTF-8
@@ -63,6 +64,19 @@ RUN case "${TARGETARCH}" in \
 
 ENV PATH="/usr/local/go/bin:${PATH}"
 ENV GOPATH="/home/coder/go"
+
+# Terraform
+RUN case "${TARGETARCH}" in \
+      amd64) TERRAFORM_ARCH="amd64" ;; \
+      arm64) TERRAFORM_ARCH="arm64" ;; \
+      *) echo "Unsupported architecture for Terraform: ${TARGETARCH}" && exit 1 ;; \
+    esac \
+    && curl -fsSL -o /tmp/terraform.zip \
+      "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${TERRAFORM_ARCH}.zip" \
+    && unzip -q /tmp/terraform.zip -d /usr/local/bin \
+    && chmod +x /usr/local/bin/terraform \
+    && rm -f /tmp/terraform.zip \
+    && terraform version
 
 # kubectl
 RUN curl -fsSL -o /usr/local/bin/kubectl \
